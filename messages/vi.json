@@ -812,5 +812,32 @@
     "Booking": {
       "BookingHistory": "Đặt vé"
     }
+  },
+  "Articles": {
+    "title": "Quản lý bài viết",
+    "searchPlaceholder": "Tìm kiếm bài viết...",
+    "create": "Tạo bài viết",
+    "update": "Cập nhật bài viết",
+    "content": "Nội dung",
+    "thumbnail": "URL hình thu nhỏ",
+    "thumbnailFile": "Tải lên hình thu nhỏ",
+    "createSuccess": "Tạo bài viết thành công",
+    "updateSuccess": "Cập nhật bài viết thành công",
+    "deleteSuccess": "Xóa bài viết thành công",
+    "createError": "Không thể tạo bài viết",
+    "updateError": "Không thể cập nhật bài viết",
+    "deleteError": "Không thể xóa bài viết",
+    "likeError": "Không thể thực hiện thao tác thích",
+    "like": "Thích",
+    "dislike": "Không thích",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "confirmDelete": "Bạn có chắc chắn muốn xóa bài viết này?",
+    "author": "Tác giả",
+    "actions": "Hành động",
+    "loading": "Đang tải...",
+    "pageInfo": "Trang {page} của {total}",
+    "previous": "Trước",
+    "next": "Tiếp"
   }
 }
