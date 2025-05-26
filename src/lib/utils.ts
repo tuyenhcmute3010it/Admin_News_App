@@ -2,7 +2,6 @@ import { clsx, type ClassValue } from "clsx";
 import { UseFormSetError } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
 import { BadRequestError, EntityError, HttpError } from "./http";
-import { toast } from "@/components/ui/use-toast";
 import { OrderStatus, Role, TableStatus } from "@/constants/type";
 import envConfig from "@/config";
 import jwt from "jsonwebtoken";
@@ -249,6 +248,7 @@ export const htmlToTextForDescription = (html: string) => {
 };
 import { useAppContext } from "@/components/app-provider";
 import { Permission } from "@/types/jwt.types";
+import { toast } from "@/components/ui/use-toast";
 
 export function usePermissions() {
   const { permissions } = useAppContext();
