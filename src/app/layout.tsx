@@ -41,10 +41,7 @@ export default async function RootLayout({
                 <nav className="mt-6">
                   <ul className="space-y-2">
                     <li>
-                      <Link
-                        href="/admin"
-                        className="block p-4 hover:bg-gray-700"
-                      >
+                      <Link href="/" className="block p-4 hover:bg-gray-700">
                         Dashboard
                       </Link>
                     </li>
@@ -63,11 +60,6 @@ export default async function RootLayout({
                       >
                         Accounts
                       </Link>
-                    </li>
-                    <li>
-                      <button className="block p-4 w-full text-left hover:bg-gray-700">
-                        Logout
-                      </button>
                     </li>
                   </ul>
                 </nav>
