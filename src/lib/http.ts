@@ -391,6 +391,13 @@ const http = {
   ) {
     return requestWithRefresh<Response>("PUT", url, { ...options, body });
   },
+  patch<Response>(
+    url: string,
+    body: any,
+    options?: Omit<CustomOptions, "body"> | undefined
+  ) {
+    return requestWithRefresh<Response>("PATCH", url, { ...options, body });
+  },
   delete<Response>(
     url: string,
     options?: Omit<CustomOptions, "body"> | undefined

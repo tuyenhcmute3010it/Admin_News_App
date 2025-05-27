@@ -31,6 +31,7 @@ export default async function RootLayout({
               <aside className="w-64 bg-gray-800 text-white h-screen fixed top-0 left-0">
                 <div className="p-4">
                   <Image
+                    style={{ borderRadius: 100 }}
                     src="/logo.png"
                     alt="News App Logo"
                     width={120}
@@ -49,7 +50,7 @@ export default async function RootLayout({
                     </li>
                     <li>
                       <Link
-                        href="/articles"
+                        href="/manage/articles"
                         className="block p-4 hover:bg-gray-700"
                       >
                         Articles
@@ -57,7 +58,7 @@ export default async function RootLayout({
                     </li>
                     <li>
                       <Link
-                        href="/accounts"
+                        href="/manage/accounts"
                         className="block p-4 hover:bg-gray-700"
                       >
                         Accounts

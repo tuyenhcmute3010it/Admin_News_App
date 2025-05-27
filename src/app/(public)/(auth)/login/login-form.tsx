@@ -64,9 +64,10 @@ export default function LoginForm() {
     }
     try {
       const result = await loginMutation.mutateAsync(data);
-      console.log("Login result:", result);
+      console.log("Login result:--------------", result);
 
       localStorage.setItem("accessToken", result.payload.data.access_token);
+      localStorage.setItem("refreshToken", result.payload.data.refreshToken);
       setIsAuth(true);
       router.push("/");
       toast({

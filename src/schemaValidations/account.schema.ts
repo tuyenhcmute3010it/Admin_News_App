@@ -1,110 +1,67 @@
+// src/schemaValidations/user.schema.ts
 import { z } from "zod";
 
-// Schema for a single account
-export const AccountSchema = z.object({
-  userId: z.number(),
-  email: z.string().email("Invalid email address"),
-  fullName: z.string().min(1, "Name is required"),
-  avatar: z.string().url("Invalid URL").optional(),
-  phoneNumber: z.string().optional(),
-  citizenId: z.string().optional(),
-  // role: z.string().optional(),
-});
-
-export type AccountType = z.TypeOf<typeof AccountSchema>;
-
-// Schema for creating an account
-export const CreateEmployeeAccountBody = z
+export const CreateUserBody = z
   .object({
-    email: z.string().email("Invalid email address"),
+    email: z.string().email("Invalid email"),
     password: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z
-      .string()
-      .min(6, "Confirm password must be at least 6 characters"),
-    fullName: z.string().min(1, "Name is required"),
-    avatar: z.string().url("Invalid URL").optional(),
-    phoneNumber: z.string().optional(),
-    citizenId: z.string().optional(),
-    // role: z.string().optional(),
+    confirmPassword: z.string(),
+    name: z.string().min(1, "Name is required"),
+    phone: z.string().optional(),
+    avatar: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
 
-export type CreateEmployeeAccountBodyType = z.TypeOf<
-  typeof CreateEmployeeAccountBody
->;
-
-// Schema for updating an account
-export const UpdateEmployeeAccountBody = z
-  .object({
-    email: z.string().email("Invalid email address"),
-    fullName: z.string().min(1, "Name is required"),
-    avatar: z.string().url("Invalid URL").optional(),
-    phoneNumber: z.string().optional(),
-    citizenId: z.string().optional(),
-    changePassword: z.boolean(),
-    password: z
-      .string()
-      .min(6, "Password must be at least 6 characters")
-      .optional(),
-    confirmPassword: z
-      .string()
-      .min(6, "Confirm password must be at least 6 characters")
-      .optional(),
-  })
-  .refine(
-    (data) =>
-      !data.changePassword ||
-      (data.password && data.password === data.confirmPassword),
-    {
-      message: "Passwords do not match",
-      path: ["confirmPassword"],
-    }
-  );
-
-export type UpdateEmployeeAccountBodyType = z.TypeOf<
-  typeof UpdateEmployeeAccountBody
->;
-
-// Schema for single account response
-export const AccountRes = z.object({
-  data: AccountSchema,
-  message: z.string(),
+export const UpdateUserBody = z.object({
+  name: z.string().min(1, "Name is required").optional(),
+  phone: z.string().optional(),
+  avatar: z.string().optional(),
 });
 
-export type AccountResType = z.TypeOf<typeof AccountRes>;
-
-// Schema for account list response
-export const AccountListRes = z.object({
-  statusCode: z.number(),
-  error: z.string().nullable(),
-  message: z.string(),
-  data: z.object({
-    meta: z.object({
-      page: z.number(),
-      pageSize: z.number(),
-      pages: z.number(),
-      total: z.number(),
-    }),
-    result: z.array(AccountSchema),
-  }),
+export const UpdatePasswordBody = z.object({
+  currentPassword: z.string().min(6, "Current password is required"),
+  newPassword: z.string().min(6, "New password must be at least 6 characters"),
 });
 
-export type AccountListResType = z.TypeOf<typeof AccountListRes>;
+export type CreateUserBodyType = z.infer<typeof CreateUserBody>;
+export type UpdateUserBodyType = z.infer<typeof UpdateUserBody>;
+export type UpdatePasswordBodyType = z.infer<typeof UpdatePasswordBody>;
 
-// Schema for account parameters (e.g., ID in URL)
-export const AccountParams = z.object({
-  id: z.coerce.number(),
-});
+export type UserType = {
+  _id: string;
+  email: string;
+  name: string;
+  phone: string;
+  avatar: string;
+  status: boolean;
+  createdAt: string;
+  updatedAt: string;
+  isDeleted: boolean;
+};
 
-export type AccountParamsType = z.TypeOf<typeof AccountParams>;
-export enum CustomerObjectEnum {
-  children = "children",
-  student = "student",
-  elderly = "elderly",
-  veteran = "veteran",
-  disabled = "disabled",
-  adult = "adult",
-}
+export type UserResType = {
+  status: number;
+  message: string;
+  payload: {
+    data: UserType;
+  };
+};
+
+export type UserListResType = {
+  status: number;
+  message: string;
+  payload: {
+    data: {
+      meta: {
+        current: number;
+        pageSize: number;
+        pages: number;
+        total: number;
+      };
+      result: UserType[];
+    };
+  };
+};

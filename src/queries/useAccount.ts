@@ -1,50 +1,50 @@
-import accountApiRequest from "@/apiRequests/account";
-import {
-  CreateEmployeeAccountBodyType,
-  UpdateEmployeeAccountBodyType,
-} from "@/schemaValidations/account.schema";
+// src/queries/useUser.ts
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import userApiRequest from "@/apiRequests/account";
+import {
+  CreateUserBodyType,
+  UpdateUserBodyType,
+  UpdatePasswordBodyType,
+} from "@/schemaValidations/account.schema";
 
-export const useGetAccountList = (page: number, size: number) => {
+export const useGetUserList = (page: number, size: number) => {
   return useQuery({
-    queryKey: ["accounts", page, size],
-    queryFn: () => accountApiRequest.list(page, size),
+    queryKey: ["users", page, size],
+    queryFn: () => userApiRequest.list(page, size),
   });
 };
 
-export const useGetAccount = ({
+export const useGetUser = ({
   id,
   enabled,
 }: {
-  id: number;
+  id: string;
   enabled: boolean;
 }) => {
   return useQuery({
-    queryKey: ["accounts", id],
-    queryFn: () => accountApiRequest.getEmployee(id),
+    queryKey: ["users", id],
+    queryFn: () => userApiRequest.get(id),
     enabled,
   });
 };
 
-export const useAddAccountMutation = () => {
+export const useAddUserMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({
       body,
       avatarFile,
     }: {
-      body: CreateEmployeeAccountBodyType;
+      body: CreateUserBodyType;
       avatarFile?: File;
-    }) => accountApiRequest.addEmployee(body, avatarFile),
+    }) => userApiRequest.add(body, avatarFile),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["accounts"],
-      });
+      queryClient.invalidateQueries({ queryKey: ["users"] });
     },
   });
 };
 
-export const useUpdateAccountMutation = () => {
+export const useUpdateUserMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({
@@ -52,33 +52,40 @@ export const useUpdateAccountMutation = () => {
       body,
       avatarFile,
     }: {
-      id: number;
-      body: UpdateEmployeeAccountBodyType;
+      id: string;
+      body: UpdateUserBodyType;
       avatarFile?: File;
-    }) => accountApiRequest.updateEmployee(id, body, avatarFile),
+    }) => userApiRequest.update(id, body, avatarFile),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["accounts"],
-      });
+      queryClient.invalidateQueries({ queryKey: ["users"] });
     },
   });
 };
 
-export const useDeleteAccountMutation = () => {
+export const useUpdatePasswordMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: accountApiRequest.deleteEmployee,
+    mutationFn: (body: UpdatePasswordBodyType) =>
+      userApiRequest.updatePassword(body),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["accounts"],
-      });
+      queryClient.invalidateQueries({ queryKey: ["users"] });
     },
   });
 };
 
-export const useAccountProfile = () => {
+export const useDeleteUserMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: userApiRequest.delete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+  });
+};
+
+export const useUserProfile = () => {
   return useQuery({
-    queryKey: ["account-me"],
-    queryFn: () => accountApiRequest.me(),
+    queryKey: ["user-profile"],
+    queryFn: userApiRequest.me,
   });
 };

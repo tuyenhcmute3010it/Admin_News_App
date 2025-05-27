@@ -30,20 +30,22 @@ export function middleware(request: NextRequest) {
   }
 
   // Role-based access control
-  // if (accessToken) {
-  //   const decoded = decodeToken(accessToken);
-  //   const role = decoded.role as RoleType;
-  //   const isGuestGoToManagePath =
-  //     role === Role.Guest &&
-  //     managePaths.some((path) => pathname.startsWith(path));
-  //   const isNotGuestGoToGuestPath =
-  //     role !== Role.Guest &&
-  //     guestPath.some((path) => pathname.startsWith(path));
+  if (accessToken) {
+    const decoded = decodeToken(accessToken);
+    const role = decoded.role as RoleType;
+    console.log("role --------- ", role);
 
-  //   if (isGuestGoToManagePath || isNotGuestGoToGuestPath) {
-  //     return NextResponse.redirect(new URL("/", request.url));
-  //   }
-  // }
+    const isGuestGoToManagePath =
+      role === Role.Guest &&
+      managePaths.some((path) => pathname.startsWith(path));
+    const isNotGuestGoToGuestPath =
+      role !== Role.Guest &&
+      guestPath.some((path) => pathname.startsWith(path));
+
+    if (isGuestGoToManagePath || isNotGuestGoToGuestPath) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+  }
 
   return NextResponse.next();
 }

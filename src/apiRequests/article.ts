@@ -1,47 +1,57 @@
-// src/lib/api.ts
+// // src/apiRequests/article.ts
+// import http from "@/lib/http";
+// import {
+//   ArticleListResType,
+//   ArticleResType,
+//   CreateArticleBodyType,
+//   UpdateArticleBodyType,
+// } from "@/schemaValidations/article.schema";
 
+// const prefix = "/api/v1/articles";
+
+// const articlesApiRequest = {
+//   listArticle: (page: number = 1, size: number = 10) =>
+//     http.get<ArticleListResType>(`${prefix}?current=${page}&pageSize=${size}`),
+//   addArticle: (body: CreateArticleBodyType) =>
+//     http.post<ArticleResType>(prefix, body),
+//   updateArticle: (id: string, body: UpdateArticleBodyType) =>
+//     http.put<ArticleResType>(`${prefix}/${id}`, body),
+//   getArticle: (id: string) => http.get<ArticleResType>(`${prefix}/${id}`),
+//   deleteArticle: (id: string) => http.delete<ArticleResType>(`${prefix}/${id}`),
+//   toggleLike: (articleId: string, quantity: 1 | -1) =>
+//     http.post<ArticleResType>("/api/v1/likes", {
+//       article: articleId,
+//       quantity,
+//     }),
+// };
+
+// export default articlesApiRequest;
+
+// src/apiRequests/article.ts
 import http from "@/lib/http";
+import {
+  ArticleListResType,
+  ArticleResType,
+  CreateArticleBodyType,
+  UpdateArticleBodyType,
+} from "@/schemaValidations/article.schema";
 
-export interface Article {
-  _id: string;
-  title: string;
-  content: string;
-  thumbnail?: string;
-  author: { _id: string; name: string; email: string };
-  createdBy: { _id: string; email?: string };
-  isDeleted?: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+const prefix = "/api/v1/articles";
 
-export interface Like {
-  _id: string;
-  user: string;
-  article: { _id: string; title: string; thumbnail?: string };
-  quantity: 1 | -1;
-}
+const articleApiRequest = {
+  list: (page: number = 1, size: number = 10, search?: string) =>
+    http.get<ArticleListResType>(
+      `${prefix}?current=${page}&pageSize=${size}${
+        search ? `&search=${encodeURIComponent(search)}` : ""
+      }`
+    ),
+  get: (id: string) => http.get<ArticleResType>(`${prefix}/${id}`),
+  add: (body: CreateArticleBodyType) => http.post<ArticleResType>(prefix, body),
+  update: (id: string, body: UpdateArticleBodyType) =>
+    http.put<ArticleResType>(`${prefix}/${id}`, body),
+  delete: (id: string) => http.delete<ArticleResType>(`${prefix}/${id}`),
+  toggleLike: (articleId: string, quantity: 1 | -1) =>
+    http.post<ArticleResType>(`${prefix}/${articleId}/like`, { quantity }),
+};
 
-export const getArticles = (page: number, limit: number, query?: string) =>
-  http.get<{
-    meta: { current: number; pageSize: number; pages: number; total: number };
-    result: Article[];
-  }>("/api/v1/articles", {
-    params: { current: page, pageSize: limit },
-  });
-
-export const createArticle = (data: {
-  title: string;
-  content: string;
-  thumbnail?: string;
-}) => http.post("/api/v1/articles", data);
-
-export const updateArticle = (
-  id: string,
-  data: { title: string; content: string; thumbnail?: string }
-) => http.put(`/api/v1/articles/${id}`, data);
-
-export const deleteArticle = (id: string) =>
-  http.delete(`/api/v1/articles/${id}`);
-
-export const toggleLike = (articleId: string, quantity: 1 | -1) =>
-  http.post("/api/v1/likes", { article: articleId, quantity });
+export default articleApiRequest;

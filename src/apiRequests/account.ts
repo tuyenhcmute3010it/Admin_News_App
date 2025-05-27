@@ -1,64 +1,35 @@
+// src/apiRequests/user.ts
 import http from "@/lib/http";
 import {
-  AccountListResType,
-  AccountResType,
-  CreateEmployeeAccountBodyType,
-  UpdateEmployeeAccountBodyType,
+  UserListResType,
+  UserResType,
+  CreateUserBodyType,
+  UpdateUserBodyType,
+  UpdatePasswordBodyType,
 } from "@/schemaValidations/account.schema";
 
 const prefix = "/api/v1/users";
 const filePrefix = "/api/v1/files";
-export interface AccountProfileResponse {
-  statusCode: number;
-  error: string | null;
-  message: string;
-  data: {
-    user: {
-      id: number;
-      email: string;
-      name: string;
-      role: Role;
-    };
-  };
-}
-export interface Role {
-  id: number;
-  name: string;
-  description: string | null;
-  active: boolean;
-  createdAt: string;
-  updatedAt: string | null;
-  createdBy: string;
-  updatedBy: string | null;
-  permissions: Array<{
-    id: number;
-    name: string;
-    apiPath: string;
-    method: string;
-    module: string;
-    createdAt: string;
-    updatedAt: string | null;
-    createdBy: string;
-    updatedBy: string | null;
-  }>;
-}
 
-// Define the account profile response type
-export interface AccountProfileResponse {
-  statusCode: number;
-  error: string | null;
+export interface UserProfileResponse {
+  status: number;
   message: string;
-  data: {
-    user: {
-      id: number;
+  payload: {
+    data: {
+      _id: string;
       email: string;
       name: string;
-      role: Role;
+      phone: string;
+      avatar: string;
+      role: string;
+      permissions: Array<{
+        module: string;
+        method: string;
+      }>;
     };
   };
 }
 
-// Define file upload response type
 export interface FileUploadResponse {
   payload: {
     data: {
@@ -67,109 +38,51 @@ export interface FileUploadResponse {
     };
   };
 }
-const accountApiRequest = {
+
+const userApiRequest = {
   list: (page: number = 1, size: number = 10) =>
-    http.get<AccountListResType>(`${prefix}?page=${page - 1}&size=${size}`),
-  addEmployee: async (
-    body: CreateEmployeeAccountBodyType,
-    avatarFile?: File
-  ) => {
+    http.get<UserListResType>(`${prefix}?current=${page}&pageSize=${size}`),
+  add: async (body: CreateUserBodyType, avatarFile?: File) => {
     let avatarUrl: string | undefined;
     if (avatarFile) {
-      try {
-        const formData = new FormData();
-        formData.append("file", avatarFile);
-        formData.append("folder", "avatar");
-
-        // Debug FormData contents
-        for (let [key, value] of formData.entries()) {
-          console.log(`FormData entry: ${key}=${value}`);
-        }
-
-        const uploadResult = await http.post<{
-          data: any;
-          fileName: string;
-          uploadedAt: string;
-        }>(`${filePrefix}`, formData);
-
-        // Debug server response
-        console.log("File upload response:", uploadResult);
-
-        // Validate response
-        if (!uploadResult?.payload?.data?.fileName) {
-          throw new Error(
-            "File upload failed: fileName is missing in response"
-          );
-        }
-
-        avatarUrl = `/upload/avatar/${uploadResult.payload.data.fileName}`;
-      } catch (error) {
-        console.error("File upload error:", error);
-        throw new Error("Failed to upload avatar file");
-      }
+      const formData = new FormData();
+      formData.append("file", avatarFile);
+      formData.append("folder", "avatars");
+      const uploadResult = await http.post<FileUploadResponse>(
+        filePrefix,
+        formData
+      );
+      avatarUrl = `/upload/avatars/${uploadResult.payload.data.fileName}`;
     }
-
     const { confirmPassword, ...requestBody } = body;
-    return http.post<AccountResType>(prefix, {
+    return http.post<UserResType>(prefix, {
       ...requestBody,
+      avatar: avatarUrl || "default-avatar.jpg",
+    });
+  },
+  update: async (id: string, body: UpdateUserBodyType, avatarFile?: File) => {
+    let avatarUrl: string | undefined = body.avatar;
+    if (avatarFile) {
+      const formData = new FormData();
+      formData.append("file", avatarFile);
+      formData.append("folder", "avatars");
+      const uploadResult = await http.post<FileUploadResponse>(
+        filePrefix,
+        formData
+      );
+      avatarUrl = `/upload/avatars/${uploadResult.payload.data.fileName}`;
+    }
+    return http.put<UserResType>(prefix, {
+      _id: id,
+      ...body,
       avatar: avatarUrl,
     });
   },
-  updateEmployee: async (
-    id: number,
-    body: UpdateEmployeeAccountBodyType,
-    avatarFile?: File
-  ) => {
-    let avatarUrl: string | undefined = body.avatar;
-    if (avatarFile) {
-      try {
-        const formData = new FormData();
-        formData.append("file", avatarFile);
-        formData.append("folder", "avatar");
-
-        // Debug FormData contents
-        for (let [key, value] of formData.entries()) {
-          console.log(`FormData entry: ${key}=${value}`);
-        }
-
-        const uploadResult = await http.post<{
-          fileName: string;
-          uploadedAt: string;
-        }>(`${filePrefix}`, formData);
-
-        // Debug server response
-        console.log("File upload response:", uploadResult);
-
-        // Validate response
-        if (!uploadResult?.payload?.fileName) {
-          throw new Error(
-            "File upload failed: fileName is missing in response"
-          );
-        }
-
-        avatarUrl = `/upload/avatar/${uploadResult.payload.fileName}`;
-      } catch (error) {
-        console.error("File upload error:", error);
-        throw new Error("Failed to upload avatar file");
-      }
-    }
-
-    const { confirmPassword, changePassword, password, ...requestBody } = body;
-    const payload =
-      changePassword && password
-        ? { ...requestBody, password, avatar: avatarUrl }
-        : { ...requestBody, avatar: avatarUrl };
-    return http.put<AccountResType>(`${prefix}/${id}`, payload);
-  },
-  getEmployee: (id: number) => http.get<AccountResType>(`${prefix}/${id}`),
-  deleteEmployee: (id: number) =>
-    http.delete<AccountResType>(`${prefix}/${id}`),
-  me: async (): Promise<AccountProfileResponse> => {
-    const response = await http.get<AccountProfileResponse>(
-      "/api/v1/auth/account"
-    );
-    return response.payload;
-  },
+  updatePassword: (body: UpdatePasswordBodyType) =>
+    http.post<UserResType>(`${prefix}/password`, body),
+  get: (id: string) => http.get<UserResType>(`${prefix}/${id}`),
+  delete: (id: string) => http.delete<UserResType>(`${prefix}/${id}`),
+  me: () => http.get<UserProfileResponse>("/api/v1/auth/profile"),
 };
 
-export default accountApiRequest;
+export default userApiRequest;
