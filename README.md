@@ -15,7 +15,7 @@ A Next.js-based admin dashboard for managing news content in the News Applicatio
 
 ## Prerequisites
 
-- **Node.js**: Version 16.20.0 (use `nvm` to manage versions: `nvm install 16.20.0`)
+- **Node.js**: Version 16.20.0 (use `nvm` to manage versions: `nvm install 20.14.0`)
 - **npm**: Included with Node.js
 - **Git**: For cloning the repository ([git-scm.com](https://git-scm.com))
 - **Vercel CLI**: For deployment (`npm install -g vercel`)
@@ -29,10 +29,10 @@ A Next.js-based admin dashboard for managing news content in the News Applicatio
    cd Admin_News_App
    ```
 
-2. Switch to Node.js Version 16.20.0:
+2. Switch to Node.js Version 20.14.0:
 
    ```bash
-   nvm use 16.20.0
+   nvm use 20.14.0
    ```
 
 3. Install Dependencies:
